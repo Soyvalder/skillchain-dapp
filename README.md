@@ -1,3 +1,88 @@
+# 🎨 SkillChain - Decentralized Skill Certification Platform
+
+## 🎯 Vision
+A blockchain-based platform where educational institutions and professionals can issue verifiable skill certificates as NFTs, creating a permanent, tamper-proof record of achievements.
+
+## 🏗️ Architecture
+
+### Smart Contract Structure
+```
+SkillChainNFT (ERC721)
+├── Roles
+│   ├── Issuer (institutions/teachers)
+│   └── Student (certificate holders)
+├── Certificate Metadata
+│   ├── Skill name
+│   ├── Level (Beginner/Intermediate/Advanced/Expert)
+│   ├── Issuer info
+│   ├── Issue date
+│   └── Description
+└── Issuer Reputation System
+    ├── Certificates issued
+    ├── Verification count
+    └── Trust score
+```
+
+### User Flows
+1. **Institution Registration**: Apply to become verified issuer
+2. **Issue Certificate**: Mint NFT certificate to student's wallet
+3. **Student Portfolio**: View all earned certificates
+4. **Employer Verification**: Check authenticity of certificates
+
+## 📊 Data Models
+
+### Certificate (NFT)
+- tokenId: Unique identifier
+- skillName: e.g., "Solidity Development"
+- level: 1=Beginner, 2=Intermediate, 3=Advanced, 4=Expert
+- issuer: Address of certifying entity
+- recipient: Student's address
+- issueDate: Timestamp
+- metadata: IPFS link to detailed info
+
+### Issuer
+- address: Wallet address
+- name: Institution name
+- isVerified: Admin approval status
+- certificatesIssued: Counter
+- reputationScore: 0-100
+
+## 🛠️ Tech Stack
+- Stylus (Rust) - Smart contracts
+- ERC721 Standard - NFT certificates
+- Next.js 14 - Frontend
+- IPFS - Metadata storage
+- Arbitrum Sepolia - Deployment
+
+## 📅 Development Progress
+- [x] Day 1: Architecture & Setup
+- [ ] Day 2-3: Smart Contract Development
+- [ ] Day 4: Frontend Components
+- [ ] Day 5: Integration & Testing
+- [ ] Day 6: Deployment & Polish
+- [ ] Day 7: Documentation
+
+## 🚀 Local Development
+
+### Prerequisites
+```bash
+node >= 18.0.0
+rust >= 1.70.0
+cargo-stylus
+```
+
+### Setup
+```bash
+# Install dependencies
+npm install
+
+# Run development server
+npm run dev
+```
+
+## 📝 License
+MIT
+<!--
 # 🦀 Scaffold-Stylus
 
 A blazing-fast, developer-friendly framework for building dapps on Arbitrum using Rust and WebAssembly.
