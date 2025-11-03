@@ -1,0 +1,20 @@
+{
+  "name": "scaffold-stylus-template",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "start": "yarn workspace @scaffold-stylus/frontend dev",
+    "chain": "yarn workspace @scaffold-stylus/contracts run local",
+    "deploy": "yarn workspace @scaffold-stylus/contracts deploy",
+    "generate": "yarn workspace @scaffold-stylus/contracts generate"
+  },
+  "dependencies": {
+    "ethers": "^5.7.2"
+  },
+  "devDependencies": {
+    "dotenv": "^16.4.5",
+    "ts-node": "^10.9.2"
+  }
+}
