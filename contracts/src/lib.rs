@@ -181,4 +181,94 @@ impl SkillChainNFT {
     pub fn get_owner(&self) -> Address {
         self.owner.get()
     }
+
+    // ============================================
+    // FUNCIONES DE EMISOR
+    // ============================================
+    
+    /// Emitir un certificado (solo issuers verificados)
+    pub fn issue_certificate(
+        &mut self,
+        recipient: Address,
+        skill_name: String,
+        level: U256,
+        metadata_uri: String,
+    ) -> Result<U256, Vec<u8>> {
+        self.only_verified_issuer()?;
+        
+        // Validar level (1-4)
+        if level < U256::from(1) || level > U256::from(4) {
+            return Err(b"Level must be 1-4".to_vec());
+        }
+        
+        let caller = msg::sender();
+        let token_id = self.next_token_id.get();
+        let timestamp = U256::from(block::timestamp());
+        
+        // Crear certificado
+        let mut cert = self.certificates.setter(token_id);
+        cert.token_id.set(token_id);
+        cert.skill_name.set_str(&skill_name);
+        cert.level.set(level);
+        cert.issuer.set(caller);
+        cert.recipient.set(recipient);
+        cert.issue_date.set(timestamp);
+        cert.metadata_uri.set_str(&metadata_uri);
+        
+        // Actualizar ownership
+        self.token_owners.setter(token_id).set(recipient);
+        
+        // Añadir a la lista de tokens del owner
+        let mut owner_token_list = self.owner_tokens.setter(recipient);
+        let mut new_token = owner_token_list.grow();
+        new_token.set(token_id);
+        
+        // Actualizar balances
+        let current_balance = self.balances.get(recipient);
+        self.balances.setter(recipient).set(current_balance + U256::from(1));
+        
+        // Actualizar estadísticas del issuer
+        let mut issuer = self.issuers.setter(caller);
+        let issued = issuer.certificates_issued.get();
+        issuer.certificates_issued.set(issued + U256::from(1));
+        
+        // Actualizar estado del contrato
+        self.next_token_id.set(token_id + U256::from(1));
+        self.total_supply.set(self.total_supply.get() + U256::from(1));
+        
+        Ok(token_id)
+    }
+    
+    /// Obtener datos de un certificado
+    pub fn get_certificate(&self, token_id: U256) -> Result<(String, U256, Address, Address, U256, String), Vec<u8>> {
+        let cert = self.certificates.get(token_id);
+        
+        // Verificar que existe
+        if cert.recipient.get() == Address::ZERO {
+            return Err(b"Certificate does not exist".to_vec());
+        }
+        
+        Ok((
+            cert.skill_name.get_string(),
+            cert.level.get(),
+            cert.issuer.get(),
+            cert.recipient.get(),
+            cert.issue_date.get(),
+            cert.metadata_uri.get_string(),
+        ))
+    }
+    
+    /// Obtener todos los certificados de un owner
+    pub fn get_certificates_by_owner(&self, owner: Address) -> Vec<U256> {
+        let token_list = self.owner_tokens.get(owner);
+        let mut tokens = Vec::new();
+        
+        for i in 0..token_list.len() {
+            if let Some(token) = token_list.get(i) {
+                tokens.push(token.get());
+            }
+        }
+        
+        tokens
+    }    
 }
