@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Book, Edit3 } from 'lucide-react';
 import { createPublicClient, createWalletClient, http, getContract, Address } from 'viem';
+import { privateKeyToAccount } from 'viem/accounts';
 import { arbitrumSepolia } from 'viem/chains';
 import contractABI from '../contracts/Counter.json';
 import deploymentInfo from '../contracts/deployment.json';
@@ -16,18 +17,25 @@ interface ContractFunction {
     params: FunctionParam[];
 }
 
-// Public client for read operations
+// RPC y cuenta desde entorno
+const RPC_URL = import.meta.env.VITE_RPC_URL as string | undefined;
+const PRIVATE_KEY = import.meta.env.VITE_PRIVATE_KEY as string | undefined;
+
+// Public client para lectura
 const publicClient = createPublicClient({
     chain: arbitrumSepolia,
-    transport: http("https://arb-sepolia.g.alchemy.com/v2/bafJTMKHwAdBGddEgxuelaJyqRC98H8X"),
+    transport: http(RPC_URL ?? 'https://arb-sepolia.g.alchemy.com/v2/'),
 });
 
-// Wallet client for write operations (requires connected wallet)
-const walletClient = createWalletClient({
-    chain: arbitrumSepolia,
-    transport: http("https://arb-sepolia.g.alchemy.com/v2/bafJTMKHwAdBGddEgxuelaJyqRC98H8X"),
-    account: '0x0a6A5Ba22da4e199bB5d8Cc04a84976C5930d049' as Address, // Replace with the actual connected account address
-});
+// Wallet client para escritura (si hay clave privada en entorno)
+const account = PRIVATE_KEY ? privateKeyToAccount(PRIVATE_KEY as `0x${string}`) : undefined;
+const walletClient = account
+    ? createWalletClient({
+        chain: arbitrumSepolia,
+        transport: http(RPC_URL ?? 'https://arb-sepolia.g.alchemy.com/v2/'),
+        account,
+    })
+    : undefined;
 
 const ContractPlayground: React.FC = () => {
     const [activeTab, setActiveTab] = useState<'read' | 'write'>('read');
@@ -77,24 +85,42 @@ const ContractPlayground: React.FC = () => {
         loadContractFunctions();
     }, []);
 
+    // Helper para parsear por tipo
+    const parseByType = (type: string, value: string): any => {
+        if (type.endsWith('[]')) {
+            const base = type.replace('[]', '');
+            return value.split(',').map(v => parseByType(base.trim(), v.trim()));
+        }
+        if (type.startsWith('uint') || type.startsWith('int')) return BigInt(value);
+        if (type === 'address') return value as Address;
+        if (type === 'bool') return value.toLowerCase() === 'true';
+        if (type === 'bytes' || type.startsWith('bytes')) return value as any;
+        return value; // string u otros
+    };
+
     const executeFunction = async (funcName: string, params: string[]) => {
         try {
             let result;
+            const abi = contractABI as any[];
+            const item = abi.find((it: any) => it.type === 'function' && it.name === funcName);
+            const inputs: string[] = (item?.inputs || []).map((i: any) => i.type);
+            const parsedArgs = params.map((p, i) => parseByType(inputs[i] || 'string', p));
             if (activeTab === 'read') {
                 // Use public client for read operations
                 result = await publicClient.readContract({
                     address: contractAddress,
                     abi: contractABI as any[],
                     functionName: funcName,
-                    args: params.map((param) => BigInt(param)), // Convert inputs to BigInt if necessary
+                    args: parsedArgs,
                 });
             } else {
                 // Use wallet client for write operations
+                if (!walletClient) throw new Error('Sin cuenta configurada para escribir. Define VITE_PRIVATE_KEY o conecta una wallet.');
                 result = await walletClient.writeContract({
                     address: contractAddress,
                     abi: contractABI as any[],
                     functionName: funcName,
-                    args: params.map((param) => BigInt(param)),
+                    args: parsedArgs,
                     value: 0n,
                 });
             }

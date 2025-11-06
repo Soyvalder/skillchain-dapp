@@ -1,0 +1,7 @@
+# Config local de Cargo (sin reemplazo de crates-io)
+# Mantén este archivo sin bloques [source.*] para que no use vendor como registro.
+[source.crates-io]
+replace-with = "vendored-sources"
+
+[source.vendored-sources]
+directory = "vendor"

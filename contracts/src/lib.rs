@@ -15,7 +15,7 @@ use alloc::vec::Vec;
 // ============================================
 
 /// Representa un certificado individual
-#[storage]
+#[solidity_storage]
 pub struct Certificate {
     token_id: StorageU256,
     skill_name: StorageString,
@@ -27,7 +27,7 @@ pub struct Certificate {
 }
 
 /// Representa un emisor de certificados (institución o profesor)
-#[storage]
+#[solidity_storage]
 pub struct Issuer {
     name: StorageString,
     is_verified: StorageBool,
@@ -39,7 +39,7 @@ pub struct Issuer {
 // CONTRATO PRINCIPAL
 // ============================================
 
-#[storage]
+#[solidity_storage]
 #[entrypoint]
 pub struct SkillChainNFT {
     // Admin del contrato
@@ -61,7 +61,7 @@ pub struct SkillChainNFT {
 // IMPLEMENTACIÓN
 // ============================================
 
-#[public]
+#[external]
 impl SkillChainNFT {
     
     /// Inicializa el contrato (solo se llama una vez)
@@ -174,7 +174,8 @@ impl SkillChainNFT {
     
     /// Owner de un token específico
     pub fn owner_of(&self, token_id: U256) -> Address {
-        self.token_owners.get(token_id).get()
+        // StorageMap<U256, StorageAddress>::get returns Address directly
+        self.token_owners.get(token_id)
     }
     
     /// Obtener el owner del contrato
@@ -265,7 +266,9 @@ impl SkillChainNFT {
         
         for i in 0..token_list.len() {
             if let Some(token) = token_list.get(i) {
-                tokens.push(token.get());
+                // token_list.get(i) retorna el valor U256 directamente (no un accessor),
+                // por lo que no se debe llamar .get() aquí.
+                tokens.push(token);
             }
         }
         

@@ -6,9 +6,12 @@
   ],
   "scripts": {
     "start": "yarn workspace @scaffold-stylus/frontend dev",
-    "chain": "yarn workspace @scaffold-stylus/contracts run local",
-    "deploy": "yarn workspace @scaffold-stylus/contracts deploy",
-    "generate": "yarn workspace @scaffold-stylus/contracts generate"
+    "frontend:dev": "yarn workspace @scaffold-stylus/frontend dev",
+    "frontend:build": "yarn workspace @scaffold-stylus/frontend build",
+    "frontend:preview": "yarn workspace @scaffold-stylus/frontend preview",
+    "contracts:build": "cargo build --manifest-path contracts/Cargo.toml",
+    "contracts:test": "cargo test --manifest-path contracts/Cargo.toml",
+    "contracts:abi": "cargo build --manifest-path contracts/Cargo.toml --features export-abi"
   },
   "dependencies": {
     "ethers": "^5.7.2"

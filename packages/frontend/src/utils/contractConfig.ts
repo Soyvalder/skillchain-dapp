@@ -1,4 +1,5 @@
 import { createPublicClient, createWalletClient, http, getContract, Address, Abi } from 'viem';
+import { privateKeyToAccount } from 'viem/accounts';
 import { arbitrumSepolia } from 'viem/chains';
 import deploymentInfo from '../contracts/deployment.json';
 import contractABIJson from '../contracts/Counter.json' assert { type: 'json' };
@@ -9,18 +10,27 @@ const contractAddress = deploymentInfo.address as Address;
 // Explicitly type contractABI as Abi
 const contractABI = contractABIJson as unknown as Abi;
 
-// Public client for read operations
+// RPC URL desde env (no hardcodear claves)
+const RPC_URL = import.meta.env.VITE_RPC_URL as string | undefined;
+
+// Public client para operaciones de lectura
 const publicClient = createPublicClient({
     chain: arbitrumSepolia,
-    transport: http("https://arb-sepolia.g.alchemy.com/v2/bafJTMKHwAdBGddEgxuelaJyqRC98H8X"),
+    transport: http(RPC_URL ?? 'https://arb-sepolia.g.alchemy.com/v2/'),
 });
 
-// Wallet client for write operations
-const walletClient = createWalletClient({
-    chain: arbitrumSepolia,
-    transport: http("https://arb-sepolia.g.alchemy.com/v2/bafJTMKHwAdBGddEgxuelaJyqRC98H8X"),
-    account: 'Y0x0a6A5Ba22da4e199bB5d8Cc04a84976C5930d049' as Address, // Replace with actual connected account address
-});
+// Cuenta opcional desde env (solo para desarrollo/test)
+const PRIVATE_KEY = import.meta.env.VITE_PRIVATE_KEY as string | undefined;
+const account = PRIVATE_KEY ? privateKeyToAccount(PRIVATE_KEY as `0x${string}`) : undefined;
+
+// Wallet client para operaciones de escritura (si hay cuenta)
+const walletClient = account
+    ? createWalletClient({
+        chain: arbitrumSepolia,
+        transport: http(RPC_URL ?? 'https://arb-sepolia.g.alchemy.com/v2/'),
+        account,
+    })
+    : undefined;
 
 // Get contract configuration
 export const getContractConfig = () => {
@@ -42,6 +52,9 @@ export const getReadContract = () => {
 
 // Get contract instance for write operations
 export const getWriteContract = () => {
+    if (!walletClient) {
+        throw new Error('No hay cuenta configurada para escritura. Define VITE_PRIVATE_KEY o usa un conector de wallet.');
+    }
     return getContract({
         address: contractAddress,
         abi: contractABI,
