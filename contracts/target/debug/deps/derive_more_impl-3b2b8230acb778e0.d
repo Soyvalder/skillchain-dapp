@@ -1,0 +1,9 @@
+C:\Users\USUARIO\Downloads\proyecto defi test\skillchain-dapp\contracts\target\debug\deps\derive_more_impl-3b2b8230acb778e0.dll: C:\Users\USUARIO\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\derive_more-impl-1.0.0\src\lib.rs C:\Users\USUARIO\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\derive_more-impl-1.0.0\src\utils.rs C:\Users\USUARIO\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\derive_more-impl-1.0.0\src\from.rs C:\Users\USUARIO\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\derive_more-impl-1.0.0\src\../README.md C:\Users\USUARIO\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\derive_more-impl-1.0.0\src\../doc/from.md
+
+C:\Users\USUARIO\Downloads\proyecto defi test\skillchain-dapp\contracts\target\debug\deps\derive_more_impl-3b2b8230acb778e0.d: C:\Users\USUARIO\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\derive_more-impl-1.0.0\src\lib.rs C:\Users\USUARIO\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\derive_more-impl-1.0.0\src\utils.rs C:\Users\USUARIO\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\derive_more-impl-1.0.0\src\from.rs C:\Users\USUARIO\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\derive_more-impl-1.0.0\src\../README.md C:\Users\USUARIO\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\derive_more-impl-1.0.0\src\../doc/from.md
+
+C:\Users\USUARIO\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\derive_more-impl-1.0.0\src\lib.rs:
+C:\Users\USUARIO\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\derive_more-impl-1.0.0\src\utils.rs:
+C:\Users\USUARIO\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\derive_more-impl-1.0.0\src\from.rs:
+C:\Users\USUARIO\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\derive_more-impl-1.0.0\src\../README.md:
+C:\Users\USUARIO\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\derive_more-impl-1.0.0\src\../doc/from.md:

@@ -239,6 +239,32 @@ impl SkillChainNFT {
         
         Ok(token_id)
     }
+
+    /// Emitir certificados por lote (solo issuers verificados)
+    pub fn batch_issue_certificates(
+        &mut self,
+        recipients: Vec<Address>,
+        skill_name: String,
+        level: U256,
+        metadata_uri: String,
+    ) -> Result<Vec<U256>, Vec<u8>> {
+        // Verifica permisos del emisor
+        self.only_verified_issuer()?;
+
+        let mut token_ids: Vec<U256> = Vec::new();
+
+        for recipient in recipients {
+            let token_id = self.issue_certificate(
+                recipient,
+                skill_name.clone(),
+                level,
+                metadata_uri.clone(),
+            )?;
+            token_ids.push(token_id);
+        }
+
+        Ok(token_ids)
+    }
     
     /// Obtener datos de un certificado
     pub fn get_certificate(&self, token_id: U256) -> Result<(String, U256, Address, Address, U256, String), Vec<u8>> {
