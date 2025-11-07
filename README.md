@@ -157,6 +157,7 @@ VITE_WALLETCONNECT_PROJECT_ID=<tu_id>
 ```
 
 Link de producción: [pendiente]
+Link de producción: https://frontend-86ndcyfcz-valders-projects-d02f2de7.vercel.app
 
 ## 🔄 Inicialización ERC-20 (post-deploy)
 Script de ayuda: `packages/frontend/scripts/init-erc20.js`
@@ -179,6 +180,8 @@ Esto ejecuta `initialize(name, symbol, decimals, initial_supply, owner)` y asign
 - [ ] Inicialización ERC-20 ejecutada y verificada onchain (pendiente de `PRIVATE_KEY`)
 - [ ] Repo público en GitHub con ≥5 commits en ≥3 días (pendiente publicar)
 - [ ] Frontend desplegado en Vercel y documentado (pendiente publicar)
+- [x] Repo público en GitHub con ≥5 commits en ≥3 días (publicado; continuar cadencia de commits)
+- [x] Frontend desplegado en Vercel y documentado
 
 ## 📝 Entregables del Challenge
 - Repo público con al menos 5 commits en 3 días

@@ -48,10 +48,6 @@
     "vitest": "^1.6.1"
   },
   "overrides": {
-    "ws": "8.19.1",
-    "@ethersproject/providers": {
-      "ws": "7.5.10"
-    },
     "nanoid": "4.0.2",
     "sha.js": "2.4.12"
   }
