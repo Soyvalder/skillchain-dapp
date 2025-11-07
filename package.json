@@ -19,5 +19,11 @@
   "devDependencies": {
     "dotenv": "^16.4.5",
     "ts-node": "^10.9.2"
+  },
+  "overrides": {
+    "ws": "8.19.1",
+    "@ethersproject/providers": {
+      "ws": "7.5.10"
+    }
   }
 }

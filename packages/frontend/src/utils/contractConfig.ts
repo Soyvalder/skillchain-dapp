@@ -2,7 +2,7 @@ import { createPublicClient, createWalletClient, http, getContract, Address, Abi
 import { privateKeyToAccount } from 'viem/accounts';
 import { arbitrumSepolia } from 'viem/chains';
 import deploymentInfo from '../contracts/deployment.json';
-import contractABIJson from '../contracts/Counter.json' assert { type: 'json' };
+import contractABIJson from '../contracts/SkillChainNFT.json' assert { type: 'json' };
 
 // Define contract address as Address type
 const contractAddress = deploymentInfo.address as Address;
@@ -16,7 +16,7 @@ const RPC_URL = import.meta.env.VITE_RPC_URL as string | undefined;
 // Public client para operaciones de lectura
 const publicClient = createPublicClient({
     chain: arbitrumSepolia,
-    transport: http(RPC_URL ?? 'https://arb-sepolia.g.alchemy.com/v2/'),
+    transport: http(RPC_URL ?? 'https://sepolia-rollup.arbitrum.io/rpc'),
 });
 
 // Cuenta opcional desde env (solo para desarrollo/test)
@@ -27,7 +27,7 @@ const account = PRIVATE_KEY ? privateKeyToAccount(PRIVATE_KEY as `0x${string}`) 
 const walletClient = account
     ? createWalletClient({
         chain: arbitrumSepolia,
-        transport: http(RPC_URL ?? 'https://arb-sepolia.g.alchemy.com/v2/'),
+        transport: http(RPC_URL ?? 'https://sepolia-rollup.arbitrum.io/rpc'),
         account,
     })
     : undefined;

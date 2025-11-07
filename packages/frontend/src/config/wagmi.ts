@@ -4,7 +4,7 @@ import { configureChains, createConfig } from 'wagmi';
 import { arbitrumSepolia } from 'wagmi/chains';
 import { publicProvider } from 'wagmi/providers/public';
 
-const projectId = 'YOUR_WALLET_CONNECT_PROJECT_ID';
+const projectId = import.meta.env.VITE_WALLETCONNECT_PROJECT_ID as string | undefined;
 
 const { chains, publicClient } = configureChains(
     [arbitrumSepolia],
@@ -13,7 +13,7 @@ const { chains, publicClient } = configureChains(
 
 const { connectors } = getDefaultWallets({
     appName: 'Scaffold-Stylus',
-    projectId: projectId,
+    projectId: projectId ?? 'scaffold-stylus',
     chains,
 });
 

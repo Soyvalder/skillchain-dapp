@@ -48,37 +48,109 @@ SkillChainNFT (ERC721)
 - reputationScore: 0-100
 
 ## 🛠️ Tech Stack
-- Stylus (Rust) - Smart contracts
-- ERC721 Standard - NFT certificates
-- Next.js 14 - Frontend
-- IPFS - Metadata storage
-- Arbitrum Sepolia - Deployment
+- Stylus (Rust) — Smart contracts (WASM)
+- ERC721-like (soul-bound) — NFT certificates
+- Vite + React + TypeScript — Frontend UI
+- Viem + Wagmi + RainbowKit — Wallet & RPC
+- IPFS — Metadata storage (URIs)
+- Arbitrum Sepolia — Testnet & Deployment
 
-## 📅 Development Progress
-- [x] Day 1: Architecture & Setup
-- [ ] Day 2-3: Smart Contract Development
-- [ ] Day 4: Frontend Components
-- [ ] Day 5: Integration & Testing
-- [ ] Day 6: Deployment & Polish
-- [ ] Day 7: Documentation
+## 🎯 Objetivo del Challenge
+- Elegir plantilla Scaffold-Stylus y mejorarla (contratos Rust + UI)
+- Demostrar capacidades Stylus: contratos Rust, hooks reutilizables, playground
+- Probar en Devnet/Sepolia y desplegar en Arbitrum Sepolia
+- Desplegar frontend en Vercel
+- Documentar: dirección del contrato y link de Vercel
 
-## 🚀 Local Development
+## 📅 Avances
+- [x] Arquitectura y setup base
+- [x] Contrato Rust SkillChainNFT (emisión y lectura)
+- [x] Playground de contrato (lectura/escritura genérica)
+- [ ] Integración avanzada de UI (admin/issuer/usuario)
+- [ ] Despliegue final en Vercel
+- [ ] Documentación final con enlaces
 
-### Prerequisites
-```bash
-node >= 18.0.0
-rust >= 1.70.0
-cargo-stylus
+## 🚀 Desarrollo Local
+
+### Prerrequisitos
+- `node >= 18.0.0`
+- `rust >= 1.70.0`
+- `cargo-stylus` y `cargo-stylus-check`
+- Objetivo WASM: `rustup target add wasm32-unknown-unknown`
+
+### Variables de entorno (frontend)
+Crear `packages/frontend/.env` a partir de `packages/frontend/.env.example`:
+```
+VITE_RPC_URL=https://sepolia-rollup.arbitrum.io/rpc
+# opcional para escritura con viem (DEV):
+VITE_PRIVATE_KEY=0x...
+# opcional: WalletConnect
+VITE_WALLETCONNECT_PROJECT_ID=YOUR_ID
 ```
 
-### Setup
+### Iniciar
 ```bash
-# Install dependencies
+# Instalar dependencias del frontend
+cd packages/frontend
 npm install
 
-# Run development server
+# Servidor de desarrollo
 npm run dev
 ```
+
+Visita `http://localhost:5173`.
+
+## 🔧 Contratos Stylus (Rust)
+Ubicación: `contracts/`
+
+Comandos clave:
+```bash
+# Exportar ABI (requiere feature export-abi)
+cargo stylus export-abi --output ./abi.json --json --features export-abi
+
+# Compilar a WASM
+rustup target add wasm32-unknown-unknown
+cargo build --release --target wasm32-unknown-unknown
+
+# Verificación onchain (sin desplegar)
+cargo stylus check --endpoint "https://sepolia-rollup.arbitrum.io/rpc" --verbose
+
+# Despliegue a testnet (Arbitrum Sepolia)
+cargo stylus deploy --private-key-path <PRIVKEY> --endpoint "https://sepolia-rollup.arbitrum.io/rpc"
+```
+
+Notas:
+- El contrato `SkillChainNFT` implementa emisión de certificados, emisión en lote y lecturas.
+- No hay funciones de transferencia (soul-bound por diseño).
+- Estructuras: `Certificate`, `Issuer`; controles de acceso para admin y emisores verificados.
+
+## 🌐 RPC y Red
+- RPC público: `https://sepolia-rollup.arbitrum.io/rpc`
+- Chain ID: `421614` (Arbitrum Sepolia)
+- En `frontend`, el RPC se toma de `VITE_RPC_URL` con fallback al endpoint público.
+
+## 📄 Dirección del Contrato y ABI
+- Dirección desplegada (frontend `deployment.json`): `0xbb9c6128bf415341f074f1db2b7334c8e5d11c0a`
+- ABI utilizado por el frontend: `packages/frontend/src/contracts/SkillChainNFT.json`
+
+## 🧪 Playground del Contrato
+- Página `ContractDashboard` incluye un playground que lista funciones del ABI y permite:
+  - Lecturas con `publicClient` (Viem)
+  - Escrituras si se define `VITE_PRIVATE_KEY` (solo DEV)
+
+## 🚀 Despliegue en Vercel
+Desde `packages/frontend`:
+```bash
+npm run build
+npx vercel --prod
+```
+Incluye el `VITE_RPC_URL` en variables de entorno del proyecto en Vercel.
+
+## 📝 Entregables del Challenge
+- Repo público con al menos 5 commits en 3 días
+- Contrato y frontend funcionando en Arbitrum Sepolia
+- Link de Vercel publicado en este README
+- Dirección del contrato y endpoint de verificación documentados
 
 ## 📝 License
 MIT

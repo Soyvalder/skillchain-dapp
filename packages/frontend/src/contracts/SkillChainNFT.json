@@ -1,0 +1,121 @@
+[
+  {
+    "type": "function",
+    "name": "initialize",
+    "stateMutability": "nonpayable",
+    "inputs": [{ "name": "admin", "type": "address" }],
+    "outputs": []
+  },
+  {
+    "type": "function",
+    "name": "add_verified_issuer",
+    "stateMutability": "nonpayable",
+    "inputs": [
+      { "name": "issuer_address", "type": "address" },
+      { "name": "issuer_name", "type": "string" }
+    ],
+    "outputs": []
+  },
+  {
+    "type": "function",
+    "name": "remove_issuer",
+    "stateMutability": "nonpayable",
+    "inputs": [{ "name": "issuer_address", "type": "address" }],
+    "outputs": []
+  },
+  {
+    "type": "function",
+    "name": "update_issuer_reputation",
+    "stateMutability": "nonpayable",
+    "inputs": [
+      { "name": "issuer_address", "type": "address" },
+      { "name": "new_score", "type": "uint256" }
+    ],
+    "outputs": []
+  },
+  {
+    "type": "function",
+    "name": "get_issuer_info",
+    "stateMutability": "view",
+    "inputs": [{ "name": "issuer_address", "type": "address" }],
+    "outputs": [
+      { "name": "name", "type": "string" },
+      { "name": "is_verified", "type": "bool" },
+      { "name": "certificates_issued", "type": "uint256" },
+      { "name": "reputation_score", "type": "uint256" }
+    ]
+  },
+  {
+    "type": "function",
+    "name": "total_supply",
+    "stateMutability": "view",
+    "inputs": [],
+    "outputs": [{ "name": "", "type": "uint256" }]
+  },
+  {
+    "type": "function",
+    "name": "balance_of",
+    "stateMutability": "view",
+    "inputs": [{ "name": "owner", "type": "address" }],
+    "outputs": [{ "name": "", "type": "uint256" }]
+  },
+  {
+    "type": "function",
+    "name": "owner_of",
+    "stateMutability": "view",
+    "inputs": [{ "name": "token_id", "type": "uint256" }],
+    "outputs": [{ "name": "", "type": "address" }]
+  },
+  {
+    "type": "function",
+    "name": "get_owner",
+    "stateMutability": "view",
+    "inputs": [],
+    "outputs": [{ "name": "", "type": "address" }]
+  },
+  {
+    "type": "function",
+    "name": "issue_certificate",
+    "stateMutability": "nonpayable",
+    "inputs": [
+      { "name": "recipient", "type": "address" },
+      { "name": "skill_name", "type": "string" },
+      { "name": "level", "type": "uint256" },
+      { "name": "metadata_uri", "type": "string" }
+    ],
+    "outputs": [{ "name": "token_id", "type": "uint256" }]
+  },
+  {
+    "type": "function",
+    "name": "batch_issue_certificates",
+    "stateMutability": "nonpayable",
+    "inputs": [
+      { "name": "recipients", "type": "address[]" },
+      { "name": "skill_name", "type": "string" },
+      { "name": "level", "type": "uint256" },
+      { "name": "metadata_uri", "type": "string" }
+    ],
+    "outputs": [{ "name": "token_ids", "type": "uint256[]" }]
+  },
+  {
+    "type": "function",
+    "name": "get_certificate",
+    "stateMutability": "view",
+    "inputs": [{ "name": "token_id", "type": "uint256" }],
+    "outputs": [
+      { "name": "skill_name", "type": "string" },
+      { "name": "level", "type": "uint256" },
+      { "name": "issuer", "type": "address" },
+      { "name": "recipient", "type": "address" },
+      { "name": "issue_date", "type": "uint256" },
+      { "name": "metadata_uri", "type": "string" }
+    ]
+  },
+  {
+    "type": "function",
+    "name": "get_certificates_by_owner",
+    "stateMutability": "view",
+    "inputs": [{ "name": "owner", "type": "address" }],
+    "outputs": [{ "name": "tokens", "type": "uint256[]" }]
+  }
+]

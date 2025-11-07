@@ -3,7 +3,7 @@ import { Book, Edit3 } from 'lucide-react';
 import { createPublicClient, createWalletClient, http, getContract, Address } from 'viem';
 import { privateKeyToAccount } from 'viem/accounts';
 import { arbitrumSepolia } from 'viem/chains';
-import contractABI from '../contracts/Counter.json';
+import contractABI from '../contracts/SkillChainNFT.json';
 import deploymentInfo from '../contracts/deployment.json';
 
 interface FunctionParam {
@@ -24,7 +24,7 @@ const PRIVATE_KEY = import.meta.env.VITE_PRIVATE_KEY as string | undefined;
 // Public client para lectura
 const publicClient = createPublicClient({
     chain: arbitrumSepolia,
-    transport: http(RPC_URL ?? 'https://arb-sepolia.g.alchemy.com/v2/'),
+    transport: http(RPC_URL ?? 'https://sepolia-rollup.arbitrum.io/rpc'),
 });
 
 // Wallet client para escritura (si hay clave privada en entorno)
@@ -32,7 +32,7 @@ const account = PRIVATE_KEY ? privateKeyToAccount(PRIVATE_KEY as `0x${string}`) 
 const walletClient = account
     ? createWalletClient({
         chain: arbitrumSepolia,
-        transport: http(RPC_URL ?? 'https://arb-sepolia.g.alchemy.com/v2/'),
+        transport: http(RPC_URL ?? 'https://sepolia-rollup.arbitrum.io/rpc'),
         account,
     })
     : undefined;
