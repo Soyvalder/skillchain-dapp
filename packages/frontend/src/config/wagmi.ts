@@ -2,13 +2,15 @@ import '@rainbow-me/rainbowkit/styles.css';
 import { getDefaultWallets } from '@rainbow-me/rainbowkit';
 import { configureChains, createConfig } from 'wagmi';
 import { arbitrumSepolia } from 'wagmi/chains';
-import { publicProvider } from 'wagmi/providers/public';
+import { jsonRpcProvider } from 'wagmi/providers/jsonRpc';
 
 const projectId = import.meta.env.VITE_WALLETCONNECT_PROJECT_ID as string | undefined;
 
+const RPC_URL = (import.meta.env.VITE_RPC_URL as string | undefined) ?? 'https://rpc.ankr.com/arbitrum_sepolia';
+
 const { chains, publicClient } = configureChains(
     [arbitrumSepolia],
-    [publicProvider()]
+    [jsonRpcProvider({ rpc: () => ({ http: RPC_URL }) })]
 );
 
 const { connectors } = getDefaultWallets({

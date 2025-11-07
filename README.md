@@ -125,13 +125,17 @@ Notas:
 - Estructuras: `Certificate`, `Issuer`; controles de acceso para admin y emisores verificados.
 
 ## 🌐 RPC y Red
-- RPC público: `https://sepolia-rollup.arbitrum.io/rpc`
+- RPC público: `https://rpc.ankr.com/arbitrum_sepolia` (fallback en frontend)
 - Chain ID: `421614` (Arbitrum Sepolia)
 - En `frontend`, el RPC se toma de `VITE_RPC_URL` con fallback al endpoint público.
 
-## 📄 Dirección del Contrato y ABI
-- Dirección desplegada (frontend `deployment.json`): `0xbb9c6128bf415341f074f1db2b7334c8e5d11c0a`
-- ABI utilizado por el frontend: `packages/frontend/src/contracts/SkillChainNFT.json`
+## 📄 Direcciones de Contrato y ABI
+- ERC-20 Stylus desplegado: `0x0eb0196d3e847fe19c6bbe860cc3567d8fdc00e9`
+  - Tx deploy: `0x1c25d32f97f5affa715f5d50a50379ffcd333de788c7fa25511b21542acfc481`
+  - Tx activación: `0xf522a846b1b0880c68c4ab8060899a171a970e121450abb8633da6de065bdf10`
+  - Cache bid: `0xfe58ad28163354690ebe29f600a10d8296bb96a9a8460ae214c59aa2141b1c8b`
+- ABI ERC-20: `packages/frontend/src/contracts/ERC20.json`
+- Address usado por el playground: `packages/frontend/src/contracts/erc20.deployment.json`
 
 ## 🧪 Playground del Contrato
 - Página `ContractDashboard` incluye un playground que lista funciones del ABI y permite:
@@ -145,6 +149,36 @@ npm run build
 npx vercel --prod
 ```
 Incluye el `VITE_RPC_URL` en variables de entorno del proyecto en Vercel.
+
+Ejemplo variables en Vercel:
+```
+VITE_RPC_URL=https://rpc.ankr.com/arbitrum_sepolia
+VITE_WALLETCONNECT_PROJECT_ID=<tu_id>
+```
+
+Link de producción: [pendiente]
+
+## 🔄 Inicialización ERC-20 (post-deploy)
+Script de ayuda: `packages/frontend/scripts/init-erc20.js`
+
+Uso (PowerShell):
+```
+cd packages/frontend
+setx RPC_URL "https://rpc.ankr.com/arbitrum_sepolia"
+$env:RPC_URL="https://rpc.ankr.com/arbitrum_sepolia"
+$env:PRIVATE_KEY="0x<tu_private_key>"
+node scripts/init-erc20.js "SkillToken" "SKL" 18 1
+```
+Esto ejecuta `initialize(name, symbol, decimals, initial_supply, owner)` y asigna el supply inicial al owner.
+
+## ✅ Checklist del Challenge (Objetivo)
+- [x] Plantilla Scaffold-Stylus seleccionada y mejorada (contratos Rust + UI)
+- [x] Contrato ERC-20 Stylus verificado y desplegado en Arbitrum Sepolia
+- [x] Frontend con playground ERC-20 funcionando en Dev
+- [x] Cache bid ejecutado para abaratar llamadas
+- [ ] Inicialización ERC-20 ejecutada y verificada onchain (pendiente de `PRIVATE_KEY`)
+- [ ] Repo público en GitHub con ≥5 commits en ≥3 días (pendiente publicar)
+- [ ] Frontend desplegado en Vercel y documentado (pendiente publicar)
 
 ## 📝 Entregables del Challenge
 - Repo público con al menos 5 commits en 3 días
@@ -266,3 +300,69 @@ We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) f
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+# SkillChain DApp – Scaffold Stylus
+
+Este proyecto demuestra integración de contratos Stylus en Rust con una dApp React (Vite) y `wagmi/RainbowKit`, incluyendo gestión de emisores y certificados (NFT-like) y ahora un Playground ERC‑20.
+
+## Checklist de requisitos
+
+- [x] Plantilla inicial `skillchain-dapp` basada en Scaffold Stylus.
+- [ ] Elegida plantilla ERC‑20: dApp que usa contratos ERC‑20 en Rust Stylus.
+- [x] Mejoras de interfaz de usuario: integración de `wagmi` con firma de wallet y feedback de transacciones.
+- [x] Demostración de capacidades de Scaffold Stylus: contrato Stylus (Rust) activo y reutilización de hooks/componentes.
+- [ ] Pruebas en Devnet o Sepolia; despliegue en Arbitrum Sepolia.
+- [ ] Despliegue completo en Vercel (`yarn vercel`).
+- [ ] Documentación del enfoque (este README).
+- [ ] Dirección del contrato desplegado y enlace de Vercel visibles.
+
+## Cómo validar cada punto
+
+1) Plantilla inicial
+- Estructura monorepo con `packages/frontend` y `contracts`. Ejecuta `npm run frontend:dev` o `cd packages/frontend && npm run dev`.
+
+2) DApp ERC‑20 en Rust
+- Opciones:
+  - Implementar un contrato ERC‑20 en `contracts/src/lib.rs` (Stylus Rust) o añadir una crate separada.
+  - Exportar ABI: `npm run contracts:abi`.
+  - Desplegar a Arbitrum Sepolia (guía abajo) y copiar el address en `packages/frontend/src/contracts/erc20.deployment.json`.
+- Frontend listo: usa el nuevo `ERC-20 Playground` en el Dashboard, pegando el address del contrato y probando `balanceOf`, `transfer`, `approve`.
+
+3) Mejoras de UI / Contratos
+- UI: componentes `IssuerManagement`, `IssueCertificate` y `ERC20Playground` con validación de red (421614) y feedback (hash/estado/enlace explorer).
+- Contratos: `contracts/src/lib.rs` contiene el contrato Stylus para certificados (NFT-like).
+
+4) Demostración Scaffold Stylus
+- Contratos en Rust (Stylus) y hooks `wagmi` reutilizados (`useContractRead`, `useContractWrite`, `useWaitForTransaction`).
+
+5) Pruebas y despliegue en Arbitrum Sepolia
+- Prueba local con Sepolia/Arbitrum Sepolia en tu wallet.
+- Despliegue Stylus (resumen genérico):
+  - `cd contracts`
+  - `cargo stylus build` (o `cargo build --features export-abi` para ABI)
+  - Usa la CLI de Arbitrum Stylus para `deploy` en cadena 421614 (ver docs oficiales de Stylus/Arbitrum). Guarda el `address`.
+  - Actualiza `packages/frontend/src/contracts/erc20.deployment.json` con el `address`.
+
+6) Despliegue en Vercel
+- Comandos agregados: `yarn vercel` y `yarn vercel:prod` ejecutan Vercel desde `packages/frontend`.
+- Requisitos: tener `vercel` CLI autenticado (`npx vercel login`).
+
+7) Documentación
+- Este README resume el enfoque y pasos de validación.
+
+8) Dirección de contrato y enlace Vercel
+- Añade aquí tras el despliegue:
+  - Address contrato ERC‑20 (Arbitrum Sepolia): `0x...`
+  - URL Vercel: `https://<tu-proyecto>.vercel.app/`
+
+## Uso en la dApp
+
+- Conecta tu wallet a Arbitrum Sepolia (421614) desde el header.
+- Dashboard:
+  - Contract Playground: pruebas varias del contrato actual.
+  - Issuers & Certificates: añadir emisores (owner-only), consultar issuer info, emitir certificados (issuer verificado).
+  - ERC‑20 Playground: consulta `name/symbol/decimals/supply/balance`, ejecuta `transfer` y `approve`.
+
+## Notas
+
+- Si `Add Issuer` falla, probablemente no eres admin (owner) del contrato; cambia a la cuenta owner o llama `initialize` con ese admin.
+- Para ERC‑20 en Rust, puedes partir de implementaciones públicas de Stylus o adaptar una mínima (almacenando `balances`, `allowances` y eventos `Transfer/Approval`).

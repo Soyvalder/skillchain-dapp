@@ -16,7 +16,7 @@ const RPC_URL = import.meta.env.VITE_RPC_URL as string | undefined;
 // Public client para operaciones de lectura
 const publicClient = createPublicClient({
     chain: arbitrumSepolia,
-    transport: http(RPC_URL ?? 'https://sepolia-rollup.arbitrum.io/rpc'),
+    transport: http(RPC_URL ?? 'https://rpc.ankr.com/arbitrum_sepolia'),
 });
 
 // Cuenta opcional desde env (solo para desarrollo/test)
@@ -27,7 +27,7 @@ const account = PRIVATE_KEY ? privateKeyToAccount(PRIVATE_KEY as `0x${string}`) 
 const walletClient = account
     ? createWalletClient({
         chain: arbitrumSepolia,
-        transport: http(RPC_URL ?? 'https://sepolia-rollup.arbitrum.io/rpc'),
+        transport: http(RPC_URL ?? 'https://rpc.ankr.com/arbitrum_sepolia'),
         account,
     })
     : undefined;

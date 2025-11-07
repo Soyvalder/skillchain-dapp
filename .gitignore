@@ -18,6 +18,7 @@ out/
 # misc
 .DS_Store
 *.pem
+*.key
 
 # debug logs
 npm-debug.log*
@@ -26,6 +27,7 @@ yarn-error.log*
 
 # env files
 .env*
+.envrc*
 
 # typescript
 *.tsbuildinfo

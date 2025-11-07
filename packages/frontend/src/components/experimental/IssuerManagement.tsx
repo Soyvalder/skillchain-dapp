@@ -1,27 +1,38 @@
 "use client";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Address } from "viem";
-
-// Nota: requiere hooks de lectura/escritura. Adaptar a viem/wagmi.
+import { useAccount, useChainId, useContractWrite, useContractRead, useWaitForTransaction } from "wagmi";
+import contractABI from "../../contracts/SkillChainNFT.json";
+import deploymentInfo from "../../contracts/deployment.json";
 
 export const IssuerManagement = () => {
   const [newIssuerAddress, setNewIssuerAddress] = useState("");
   const [newIssuerName, setNewIssuerName] = useState("");
   const [checkAddress, setCheckAddress] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [txHash, setTxHash] = useState<string | undefined>(undefined);
+  const [errorMsg, setErrorMsg] = useState<string | undefined>(undefined);
 
-  const writeContractAsync = async (_args: {
-    functionName: string;
-    args: [Address, string];
-  }) => {
-    throw new Error(
-      "Hook de escritura no configurado. Integra viem/wagmi para habilitar."
-    );
-  };
+  const contractAddress = deploymentInfo.address as Address;
+  const { writeAsync } = useContractWrite({
+    address: contractAddress,
+    abi: contractABI as any[],
+    functionName: "add_verified_issuer",
+  });
 
-  const readIssuerInfo = async (_address: Address) => {
-    return null; // Implementar lectura con viem `readContract` si se integra.
-  };
+  const { isConnected } = useAccount();
+  const chainId = useChainId();
+  const { data: receipt, isLoading: isConfirming, isSuccess: isConfirmed, isError: isFailed } = useWaitForTransaction({
+    hash: txHash as `0x${string}` | undefined,
+  });
+
+  const checkAddr = useMemo(() => (checkAddress ? (checkAddress as Address) : undefined), [checkAddress]);
+  const { data: issuerInfo, refetch } = useContractRead({
+    address: contractAddress,
+    abi: contractABI as any[],
+    functionName: "get_issuer_info",
+    args: checkAddr ? [checkAddr] : undefined,
+  });
 
   const handleAddIssuer = async () => {
     if (!newIssuerAddress || !newIssuerName) {
@@ -29,19 +40,30 @@ export const IssuerManagement = () => {
       return;
     }
 
+    setErrorMsg(undefined);
+
+    if (!isConnected) {
+      setErrorMsg("Wallet no conectada. Conecta tu wallet para firmar.");
+      return;
+    }
+    if (chainId !== 421614) {
+      setErrorMsg("Red incorrecta. Cambia a Arbitrum Sepolia (421614).");
+      return;
+    }
+
     setIsLoading(true);
     try {
-      await writeContractAsync({
-        functionName: "add_verified_issuer",
+      const hash = await writeAsync({
         args: [newIssuerAddress as Address, newIssuerName],
       });
-
+      setTxHash(hash as string);
       alert("✅ Issuer added successfully!");
       setNewIssuerAddress("");
       setNewIssuerName("");
     } catch (error) {
       console.error("Error adding issuer:", error);
-      alert("❌ Failed to add issuer");
+      const msg = (error as any)?.shortMessage || (error as any)?.message || "❌ Failed to add issuer";
+      setErrorMsg(msg);
     } finally {
       setIsLoading(false);
     }
@@ -76,6 +98,23 @@ export const IssuerManagement = () => {
             >
               Add Issuer
             </button>
+
+            {txHash && (
+              <div className="mt-3 text-sm">
+                <div>Tx Hash: <span className="font-mono break-all">{txHash}</span></div>
+                <a className="link" href={`https://sepolia-explorer.arbitrum.io/tx/${txHash}`} target="_blank" rel="noreferrer">Ver en explorer</a>
+                <div className="mt-2">Estado: {isConfirming ? "Confirmando..." : isConfirmed ? "Confirmada" : isFailed ? "Fallida" : "Pendiente"}</div>
+                {receipt && (
+                  <div className="mt-1">Bloque: {String(receipt.blockNumber ?? "-")}</div>
+                )}
+              </div>
+            )}
+
+            {errorMsg && (
+              <div className="mt-3 p-3 rounded bg-red-900/30 border border-red-700 text-red-200 text-sm">
+                {errorMsg}
+              </div>
+            )}
           </div>
         </div>
 
@@ -91,8 +130,15 @@ export const IssuerManagement = () => {
               value={checkAddress}
               onChange={(e) => setCheckAddress(e.target.value)}
             />
-
-            {/* Implementar render con datos reales cuando se integre la lectura */}
+            <button className="btn btn-secondary" onClick={() => refetch?.()}>Check</button>
+            {issuerInfo && Array.isArray(issuerInfo) && (
+              <div className="mt-3 p-3 rounded border border-gray-700">
+                <div className="text-sm">Name: <span className="font-mono">{String(issuerInfo[0])}</span></div>
+                <div className="text-sm">Verified: <span className="font-mono">{String(issuerInfo[1])}</span></div>
+                <div className="text-sm">Certificates Issued: <span className="font-mono">{String(issuerInfo[2])}</span></div>
+                <div className="text-sm">Reputation Score: <span className="font-mono">{String(issuerInfo[3])}</span></div>
+              </div>
+            )}
           </div>
         </div>
       </div>

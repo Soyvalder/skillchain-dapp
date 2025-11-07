@@ -1,9 +1,9 @@
 "use client";
 import { useState } from "react";
 import { Address } from "viem";
-
-// Nota: este componente es experimental y requiere hooks de Scaffold-Stylus.
-// Adaptar a viem/wagmi si se desea usar en producción.
+import { useAccount, useChainId, useContractWrite, useWaitForTransaction } from "wagmi";
+import contractABI from "../../contracts/SkillChainNFT.json";
+import deploymentInfo from "../../contracts/deployment.json";
 
 export const IssueCertificate = () => {
   const [recipient, setRecipient] = useState("");
@@ -11,15 +11,21 @@ export const IssueCertificate = () => {
   const [level, setLevel] = useState("1");
   const [metadataUri, setMetadataUri] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [txHash, setTxHash] = useState<string | undefined>(undefined);
+  const [errorMsg, setErrorMsg] = useState<string | undefined>(undefined);
 
-  const writeContractAsync = async (_args: {
-    functionName: string;
-    args: [Address, string, bigint, string];
-  }) => {
-    throw new Error(
-      "Hook de escritura no configurado. Integra viem/wagmi para habilitar."
-    );
-  };
+  const contractAddress = deploymentInfo.address as Address;
+  const { writeAsync } = useContractWrite({
+    address: contractAddress,
+    abi: contractABI as any[],
+    functionName: "issue_certificate",
+  });
+
+  const { isConnected } = useAccount();
+  const chainId = useChainId();
+  const { data: receipt, isLoading: isConfirming, isSuccess: isConfirmed, isError: isFailed } = useWaitForTransaction({
+    hash: txHash as `0x${string}` | undefined,
+  });
 
   const handleIssue = async () => {
     if (!recipient || !skillName) {
@@ -27,10 +33,20 @@ export const IssueCertificate = () => {
       return;
     }
 
+    setErrorMsg(undefined);
+
+    if (!isConnected) {
+      setErrorMsg("Wallet no conectada. Conecta tu wallet para firmar.");
+      return;
+    }
+    if (chainId !== 421614) {
+      setErrorMsg("Red incorrecta. Cambia a Arbitrum Sepolia (421614).");
+      return;
+    }
+
     setIsLoading(true);
     try {
-      await writeContractAsync({
-        functionName: "issue_certificate",
+      const hash = await writeAsync({
         args: [
           recipient as Address,
           skillName,
@@ -38,6 +54,7 @@ export const IssueCertificate = () => {
           metadataUri || `ipfs://default-${Date.now()}`,
         ],
       });
+      setTxHash(hash as string);
 
       alert("✅ Certificate issued successfully!");
 
@@ -47,7 +64,8 @@ export const IssueCertificate = () => {
       setMetadataUri("");
     } catch (error) {
       console.error("Error issuing certificate:", error);
-      alert("❌ Failed to issue certificate");
+      const msg = (error as any)?.shortMessage || (error as any)?.message || "❌ Failed to issue certificate";
+      setErrorMsg(msg);
     } finally {
       setIsLoading(false);
     }
@@ -131,6 +149,23 @@ export const IssueCertificate = () => {
           >
             {isLoading ? "Issuing..." : "🎖️ Issue Certificate"}
           </button>
+
+          {txHash && (
+            <div className="mt-3 text-sm">
+              <div>Tx Hash: <span className="font-mono break-all">{txHash}</span></div>
+              <a className="link" href={`https://sepolia-explorer.arbitrum.io/tx/${txHash}`} target="_blank" rel="noreferrer">Ver en explorer</a>
+              <div className="mt-2">Estado: {isConfirming ? "Confirmando..." : isConfirmed ? "Confirmada" : isFailed ? "Fallida" : "Pendiente"}</div>
+              {receipt && (
+                <div className="mt-1">Bloque: {String(receipt.blockNumber ?? "-")}</div>
+              )}
+            </div>
+          )}
+
+          {errorMsg && (
+            <div className="mt-3 p-3 rounded bg-red-900/30 border border-red-700 text-red-200 text-sm">
+              {errorMsg}
+            </div>
+          )}
         </div>
       </div>
     </div>
